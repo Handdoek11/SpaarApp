@@ -1,0 +1,383 @@
+name: SpaarApp CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  CARGO_TERM_COLOR: always
+  NODE_VERSION: '18'
+  RUST_VERSION: '1.75'
+
+jobs:
+  # Security and Compliance Checks
+  security-scan:
+    name: Security & Compliance Scan
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cargo fetch
+
+    - name: Run security audit (Node.js)
+      run: npm audit --audit-level=moderate
+
+    - name: Run security audit (Rust)
+      run: cargo audit
+
+    - name: Check for hardcoded secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+
+    - name: GDPR compliance check
+      run: |
+        # Check for required privacy policy files
+        if [ ! -f "docs/privacy-policy.md" ]; then
+          echo "Privacy policy not found"
+          exit 1
+        fi
+
+        # Check for GDPR compliance in code
+        grep -r "right.to.be.forgotten" src/ || echo "Warning: Right to be forgotten not implemented"
+
+    - name: OWASP security scan
+      uses: securecodewarrior/github-action-add-sarif@v1
+      with:
+        sarif-file: 'security-scan-results.sarif'
+
+  # Code Quality and Testing
+  quality-check:
+    name: Code Quality & Testing
+    runs-on: windows-latest
+    needs: security-scan
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cargo fetch
+
+    - name: TypeScript type checking
+      run: npm run type-check
+
+    - name: ESLint code quality check
+      run: npm run lint
+      continue-on-error: false
+
+    - name: Prettier format check
+      run: npm run format:check
+
+    - name: Rust code formatting check
+      run: cargo fmt --all -- --check
+
+    - name: Rust clippy linting
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Run integration tests
+      run: npm run test:integration
+      env:
+        DATABASE_URL: "sqlite:./test-db.sqlite"
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY_TEST }}
+
+    - name: Generate test coverage
+      run: npm run test:coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+
+    - name: Accessibility testing
+      run: npm run test:a11y
+
+    - name: Performance benchmarking
+      run: npm run test:performance
+
+  # Build and Package
+  build:
+    name: Build & Package
+    runs-on: windows-latest
+    needs: [security-scan, quality-check]
+    strategy:
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+        targets: ${{ matrix.target }}
+
+    - name: Install Tauri CLI
+      run: cargo install tauri-cli --version "^2.0.0"
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cargo fetch
+
+    - name: Build frontend
+      run: npm run build:frontend
+
+    - name: Build Tauri application
+      run: cargo tauri build
+      env:
+        TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+        TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+    - name: Sign Windows executable
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          signtool sign /f "${{ secrets.WINDOWS_CERT_FILE }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" /t http://timestamp.digicert.com src-tauri/target/release/bundle/msi/SpaarApp_*.msi
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: spaarapp-${{ matrix.target }}
+        path: |
+          src-tauri/target/release/bundle/msi/*.msi
+          src-tauri/target/release/spaarapp.exe
+        retention-days: 30
+
+  # AI-Assisted Review
+  ai-review:
+    name: AI-Assisted Code Review
+    runs-on: windows-latest
+    needs: quality-check
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Claude Code CLI
+      run: |
+        npm install -g @anthropic-ai/claude-code
+
+    - name: AI code review
+      run: |
+        claude-code --config .claude/config.json review-pr --pr-url "${{ github.event.pull_request.html_url }}"
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+    - name: AI accessibility review
+      run: |
+        claude-code --agent ui-visual-validator "Review accessibility compliance of this PR"
+
+    - name: AI security review
+      run: |
+        claude-code --agent security-auditor "Review security implications of this PR"
+
+    - name: AI ADHD-UX review
+      run: |
+        claude-code --agent spaarapp-financial-developer "Review ADHD-friendliness of UI changes in this PR"
+
+  # Release and Deployment
+  release:
+    name: Release & Deploy
+    runs-on: windows-latest
+    needs: [security-scan, quality-check, build]
+    if: github.event_name == 'release'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: spaarapp-x86_64-pc-windows-msvc
+        path: ./release-artifacts
+
+    - name: Create release assets
+      run: |
+        # Create installer package
+        cd release-artifacts
+        7z a -tzip ../SpaarApp-${{ github.event.release.tag_name }}-windows.zip *.msi *.exe
+
+    - name: Upload release assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          SpaarApp-${{ github.event.release.tag_name }}-windows.zip
+        draft: false
+        prerelease: ${{ contains(github.event.release.tag_name, 'beta') || contains(github.event.release.tag_name, 'alpha') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update auto-updater
+      run: |
+        # Update update manifest for auto-updater
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.UPDATE_SERVER_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"version\": \"${{ github.event.release.tag_name }}\", \"download_url\": \"${{ github.event.release.assets[0].browser_download_url }}\"}" \
+          https://updates.spaarapp.nl/api/updates
+
+    - name: Deploy to website
+      run: |
+        # Deploy to download page
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.WEBSITE_DEPLOY_TOKEN }}" \
+          -F "file=@SpaarApp-${{ github.event.release.tag_name }}-windows.zip" \
+          -F "version=${{ github.event.release.tag_name }}" \
+          https://spaarapp.nl/api/deploy
+
+  # Documentation and Monitoring
+  documentation:
+    name: Documentation & Monitoring
+    runs-on: windows-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Generate API documentation
+      run: npm run docs:generate
+
+    - name: Generate accessibility report
+      run: npm run docs:a11y-report
+
+    - name: Deploy documentation
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/dist
+
+    - name: Update analytics
+      run: |
+        # Send build metrics to monitoring service
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.MONITORING_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"event\": \"build_completed\", \"status\": \"success\", \"version\": \"${{ github.sha }}\"}" \
+          https://monitoring.spaarapp.nl/api/events
+
+  # Quality Gates
+  quality-gate:
+    name: Quality Gate
+    runs-on: windows-latest
+    needs: [security-scan, quality-check, ai-review]
+    if: always()
+    steps:
+    - name: Quality Gate Check
+      run: |
+        # Check if all critical checks passed
+        SECURITY_STATUS="${{ needs.security-scan.result }}"
+        QUALITY_STATUS="${{ needs.quality-check.result }}"
+        AI_REVIEW_STATUS="${{ needs.ai-review.result }}"
+
+        if [ "$SECURITY_STATUS" != "success" ]; then
+          echo "❌ Security check failed"
+          exit 1
+        fi
+
+        if [ "$QUALITY_STATUS" != "success" ]; then
+          echo "❌ Quality check failed"
+          exit 1
+        fi
+
+        if [ "$AI_REVIEW_STATUS" == "failure" ]; then
+          echo "❌ AI review failed"
+          exit 1
+        fi
+
+        echo "✅ All quality gates passed"
+
+    - name: Notify team
+      if: failure()
+      run: |
+        # Send notification to team
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.SLACK_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"text\": \"❌ SpaarApp CI/CD Pipeline Failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK }}
+
+  # Performance Monitoring
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: windows-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: spaarapp-x86_64-pc-windows-msvc
+        path: ./release-artifacts
+
+    - name: Performance testing
+      run: |
+        # Run performance tests on built application
+        npm run test:performance-release
+      env:
+        APP_PATH: ./release-artifacts/spaarapp.exe
+
+    - name: Update performance metrics
+      run: |
+        # Send performance data to monitoring service
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.MONITORING_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"metrics\": $(cat performance-report.json), \"version\": \"${{ github.sha }}\"}" \
+          https://monitoring.spaarapp.nl/api/performance
