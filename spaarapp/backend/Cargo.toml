@@ -1,0 +1,64 @@
+[package]
+name = "spaarapp-backend"
+version = "0.1.0"
+edition = "2021"
+authors = ["SpaarApp Team"]
+description = "Backend for SpaarApp - ADHD-friendly financial management"
+license = "MIT"
+repository = "https://github.com/spaarapp/spaarapp.git"
+
+[lib]
+name = "spaarapp_backend"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Workspace dependencies
+tauri.workspace = true
+claude-agent-sdk.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+sqlx.workspace = true
+ring.workspace = true
+argon2.workspace = true
+rand.workspace = true
+chrono.workspace = true
+reqwest.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+config.workspace = true
+dotenvy.workspace = true
+rust_decimal.workspace = true
+csv.workspace = true
+futures.workspace = true
+async-trait.workspace = true
+
+# Tauri specific
+tauri-plugin-window-state = { version = "2.0" }
+tauri-plugin-notification = { version = "2.0" }
+tauri-plugin-clipboard-manager = { version = "2.0" }
+
+# Financial data processing
+chrono-tz = "0.8"
+iso_currency = "0.4"
+iban = "0.1"
+
+# Security
+zeroize = "1.7"
+secrecy = "0.8"
+
+# File handling
+tempfile = "3.8"
+dirs = "5.0"
+
+# HTTP server (for local API)
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "fs"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

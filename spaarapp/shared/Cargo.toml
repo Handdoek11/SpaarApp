@@ -1,0 +1,21 @@
+[package]
+name = "spaarapp-shared"
+version = "0.1.0"
+edition = "2021"
+authors = ["SpaarApp Team"]
+description = "Shared types and utilities for SpaarApp"
+license = "MIT"
+repository = "https://github.com/spaarapp/spaarapp.git"
+
+[dependencies]
+# Workspace dependencies
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+uuid = { version = "1.6", features = ["v4", "serde"] }
+regex = "1.10"
+lazy_static = "1.4"
+
+[dev-dependencies]
+serde_test = "1.0"

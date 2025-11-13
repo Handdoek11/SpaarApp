@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "project": {
+    "name": "SpaarApp",
+    "type": "tauri-application",
+    "description": "ADHD-friendly financial management application for Dutch users",
+    "tech_stack": {
+      "frontend": "React + TypeScript + Material-UI",
+      "backend": "Rust (Tauri) + Python",
+      "database": "SQLite with SQLCipher",
+      "ai": "Claude Sonnet 4.5 + OpenAI GPT-4.1",
+      "sdk": "claude-agent-sdk"
+    }
+  },
+  "preferences": {
+    "codeStyle": "rustfmt + prettier",
+    "testFramework": "jest + cargo test",
+    "buildTool": "tauri + vite",
+    "language": "nl-NL",
+    "security": "financial-grade"
+  },
+  "agents": {
+    "frontend": {
+      "specialization": "react/typescript/material-ui",
+      "tools": ["eslint", "prettier", "accessibility-testing"],
+      "adhd_focus": true
+    },
+    "backend": {
+      "specialization": "rust/tauri/financial-services",
+      "tools": ["clippy", "rustfmt", "security-audit"],
+      "claude_sdk": true
+    },
+    "financial": {
+      "specialization": "fintech/gdpr/rabobank",
+      "tools": ["security-scan", "data-validation", "compliance-check"],
+      "permissions": "financial-data-access"
+    },
+    "ai": {
+      "specialization": "claude-sdk/financial-analysis",
+      "tools": ["anthropic-sdk", "openai-sdk", "data-processing"],
+      "cost_management": true
+    }
+  },
+  "skills": [
+    "tauri-development",
+    "react-typescript",
+    "financial-data-processing",
+    "accessibility-compliance",
+    "gdpr-compliance",
+    "dutch-banking-integration",
+    "adhd-ux-design",
+    "security-auditing",
+    "claude-sdk-integration"
+  ],
+  "security": {
+    "data_encryption": "SQLCipher",
+    "api_keys": "env-protected",
+    "financial_data": "zero-knowledge",
+    "gdpr_compliant": true,
+    "permissions": "role-based"
+  },
+  "development": {
+    "workspace": "spaarapp",
+    "hot_reload": true,
+    "debug_mode": true,
+    "cost_tracking": {
+      "claude_api": true,
+      "budget_alerts": true,
+      "monthly_limit": "€10.00"
+    }
+  },
+  "custom_commands": {
+    "spaarapp:dev": "Start development server with hot reload",
+    "spaarapp:build": "Build production application",
+    "spaarapp:test": "Run all tests including accessibility",
+    "spaarapp:security": "Run security audit and compliance checks",
+    "spaarapp:deploy": "Build and package for distribution"
+  },
+  "integrations": {
+    "claude_sdk": {
+      "enabled": true,
+      "permissions": ["financial-analysis", "data-processing", "report-generation"],
+      "tools": ["spaarapp-financial-tools", "rabobank-import", "budget-calculator"]
+    }
+  }
+}

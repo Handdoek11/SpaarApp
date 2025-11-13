@@ -1,0 +1,119 @@
+{
+  "name": "spaarapp",
+  "version": "0.1.0",
+  "description": "ADHD-friendly financial management application for Dutch users",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:tauri\" \"npm run dev:vite\"",
+    "dev:vite": "vite",
+    "dev:tauri": "cd spaarapp/frontend && tauri dev",
+    "build": "npm run build:frontend && npm run build:tauri",
+    "build:frontend": "vite build",
+    "build:tauri": "cd spaarapp/frontend && tauri build",
+    "preview": "vite preview",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "security": "npm audit && cargo audit",
+    "claude:analyze": "claude-code spaarapp:analyze",
+    "claude:review": "claude-code spaarapp:review",
+    "claude:test": "claude-code spaarapp:test",
+    "docs:generate": "typedoc",
+    "docs:serve": "vitepress dev docs",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "@mui/material": "^5.15.0",
+    "@mui/icons-material": "^5.15.0",
+    "@mui/x-charts": "^7.0.0",
+    "@mui/x-date-pickers": "^7.0.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "dayjs": "^1.11.0",
+    "recharts": "^2.8.0",
+    "react-hook-form": "^7.48.0",
+    "@hookform/resolvers": "^3.3.0",
+    "yup": "^1.4.0",
+    "zustand": "^4.4.0",
+    "axios": "^1.6.0",
+    "react-query": "^3.39.0",
+    "react-hot-toast": "^2.4.0",
+    "framer-motion": "^10.16.0",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-dropzone": "^14.2.0",
+    "papaparse": "^5.4.0",
+    "file-saver": "^2.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/papaparse": "^5.3.0",
+    "@types/file-saver": "^2.0.0",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.2.0",
+    "vite": "^5.0.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "prettier": "^3.1.0",
+    "jest": "^29.7.0",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "@testing-library/user-event": "^14.5.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@playwright/test": "^1.40.0",
+    "concurrently": "^8.2.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.0",
+    "typedoc": "^0.25.0",
+    "vitepress": "^1.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "financial",
+    "adhd",
+    "tauri",
+    "react",
+    "typescript",
+    "dutch-banking",
+    "personal-finance",
+    "budgeting",
+    "money-management"
+  ],
+  "author": "SpaarApp Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spaarapp/spaarapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spaarapp/spaarapp/issues"
+  },
+  "homepage": "https://spaarapp.nl"
+}
