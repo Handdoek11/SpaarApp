@@ -18,7 +18,6 @@ claude-agent-sdk.workspace = true
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-rusqlite.workspace = true
 sqlx.workspace = true
 ring.workspace = true
 argon2.workspace = true
@@ -37,9 +36,9 @@ futures.workspace = true
 async-trait.workspace = true
 
 # Tauri specific
-tauri-plugin-window-state = { version = "2.0" }
-tauri-plugin-notification = { version = "2.0" }
-tauri-plugin-clipboard-manager = { version = "2.0" }
+tauri-plugin-window-state = { workspace = true }
+tauri-plugin-notification = { workspace = true }
+tauri-plugin-clipboard-manager = { workspace = true }
 
 # Financial data processing
 chrono-tz = "0.8"

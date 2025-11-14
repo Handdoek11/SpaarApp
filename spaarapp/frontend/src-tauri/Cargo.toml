@@ -1,0 +1,86 @@
+[package]
+name = "spaarapp"
+version = "0.1.0"
+description = "ADHD-friendly financial management application for Dutch users"
+authors = ["SpaarApp Team"]
+license = "MIT"
+repository = "https://github.com/spaarapp/spaarapp"
+homepage = "https://spaarapp.nl"
+edition = "2021"
+
+[package.metadata]
+name = "SpaarApp"
+description = "ADHD-vriendelijke financiële beheer applicatie"
+version = "0.1.0"
+authors = ["SpaarApp Team"]
+
+[lib]
+name = "spaarapp"
+crate-type = ["cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { workspace = true, features = [] }
+
+[dependencies]
+# Tauri core
+tauri = { workspace = true, features = [] }
+tauri-plugin-shell = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-fs = { workspace = true }
+
+# Workspace dependencies
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Database and encryption
+sqlx = { workspace = true }
+
+# Security and cryptography
+ring = { workspace = true }
+argon2 = { workspace = true }
+rand = { workspace = true }
+
+# Date and time handling
+chrono = { workspace = true }
+time = { workspace = true }
+
+# HTTP client for API calls
+reqwest = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Configuration
+config = { workspace = true }
+dotenvy = { workspace = true }
+
+# Financial data processing
+rust_decimal = { workspace = true }
+csv = { workspace = true }
+
+# Async utilities
+futures = { workspace = true }
+async-trait = { workspace = true }
+
+# UUID generation
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# CLI argument parsing
+clap = { version = "4.4", features = ["derive"] }
+
+# Semaphore for limiting concurrent operations
+tokio-util = "0.7"
+
+# Base64 encoding/decoding
+base64 = { workspace = true }
+
+[features]
+# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
+default = ["custom-protocol"]

@@ -2,13 +2,22 @@
 members = [
     "spaarapp/backend",
     "spaarapp/shared",
+    "spaarapp/frontend/src-tauri",
 ]
 resolver = "2"
 
 [workspace.dependencies]
 # Tauri core
-tauri = { version = "2.0", features = ["shell-open"] }
+tauri = { version = "2.0", features = [] }
 tauri-build = { version = "2.0", features = [] }
+
+# Tauri plugins
+tauri-plugin-shell = "2.3"
+tauri-plugin-dialog = "2.4"
+tauri-plugin-fs = "2.4"
+tauri-plugin-window-state = "2.4"
+tauri-plugin-notification = "2.2"
+tauri-plugin-clipboard-manager = "2.2"
 
 # Claude Agent SDK
 claude-agent-sdk = "0.1"
@@ -16,9 +25,8 @@ tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
-# Database and encryption
-rusqlite = { version = "0.31", features = ["bundled", "sqlcipher"] }
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono"] }
+# Database and encryption - using sqlx for async support with SQLCipher
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono", "uuid", "macros", "rust_decimal"] }
 
 # Security and cryptography
 ring = "0.17"
@@ -48,9 +56,15 @@ dotenvy = "0.15"
 rust_decimal = { version = "1.35", features = ["serde-float"] }
 csv = "1.3"
 
+# Math utilities
+ordered-float = "3.7"
+
 # Async utilities
 futures = "0.3"
 async-trait = "0.1"
+
+# Base64 encoding/decoding
+base64 = "0.21"
 
 [profile.release]
 panic = "abort"

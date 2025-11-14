@@ -1,0 +1,259 @@
+{
+  "db": "SQLite",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "description",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "amount",
+        "ordinal": 2,
+        "type_info": "Numeric"
+      },
+      {
+        "name": "date",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "category_id",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "account_number",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "account_holder",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "transaction_type",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "balance_after",
+        "ordinal": 8,
+        "type_info": "Numeric"
+      },
+      {
+        "name": "notes",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "tags",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "is_recurring",
+        "ordinal": 11,
+        "type_info": "Boolean"
+      },
+      {
+        "name": "recurring_frequency",
+        "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 13,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 14,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    }
+  },
+  "operations": [
+    {
+      "ast": {
+        "Select": {
+          "distinct": false,
+          "projection": [
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "id",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "description",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "amount",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "date",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "category_id",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "account_number",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "account_holder",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "transaction_type",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "balance_after",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "notes",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "tags",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "is_recurring",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "recurring_frequency",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "created_at",
+                    "quote_style": null
+                  }
+                ]
+              }
+            },
+            {
+              "UnnamedExpr": {
+                "Identifier": [
+                  {
+                    "value": "updated_at",
+                    "quote_style": null
+                  }
+                ]
+              }
+            }
+          ],
+          "from": {
+            "Table": {
+              "name": "transactions",
+              "alias": null
+            }
+          },
+          "selection": null,
+          "group_by": [],
+          "having": null
+        }
+      },
+      "execute": {
+        "strategy": "Raw"
+      }
+    }
+  ],
+  "query": "SELECT id, description, amount, date, category_id, account_number, account_holder, transaction_type, balance_after, notes, tags, is_recurring, recurring_frequency, created_at, updated_at FROM transactions ORDER BY date DESC, created_at DESC"
+}
